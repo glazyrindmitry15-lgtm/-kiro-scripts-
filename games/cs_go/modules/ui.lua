@@ -1,4 +1,4 @@
-﻿-- =====================================================================
+-- =====================================================================
 -- KIRO UI | Unified Menu (Beautiful Edition)
 -- =====================================================================
 local K = shared.KIRO
@@ -11,21 +11,15 @@ local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
 
 local Theme = K.Theme or {
-    BG = Color3.fromRGB(10,10,16),
-    Glass = Color3.fromRGB(20,20,30),
-    GlassLight = Color3.fromRGB(30,30,42),
-    Accent = Color3.fromRGB(90,150,255),
-    Accent2 = Color3.fromRGB(170,90,240),
-    Text = Color3.fromRGB(240,240,250),
-    TextDim = Color3.fromRGB(130,135,155),
-    Red = Color3.fromRGB(255,90,110),
-    Green = Color3.fromRGB(80,220,140),
+    BG = Color3.fromRGB(10,10,16), Glass = Color3.fromRGB(20,20,30), GlassLight = Color3.fromRGB(30,30,42),
+    Accent = Color3.fromRGB(90,150,255), Accent2 = Color3.fromRGB(170,90,240),
+    Text = Color3.fromRGB(240,240,250), TextDim = Color3.fromRGB(130,135,155),
+    Red = Color3.fromRGB(255,90,110), Green = Color3.fromRGB(80,220,140),
 }
 local Font_Main = (K.Fonts and K.Fonts.Main) or Enum.Font.GothamMedium
 local Font_Bold = (K.Fonts and K.Fonts.Bold) or Enum.Font.GothamBold
 local Font_Black = (K.Fonts and K.Fonts.Black) or Enum.Font.GothamBlack
 
--- parent gui
 local parentGui = gethui and gethui() or game:GetService("CoreGui")
 for _, v in pairs(parentGui:GetChildren()) do
     if v.Name == "KiroUnifiedUI" then v:Destroy() end
@@ -40,7 +34,7 @@ gui.DisplayOrder = 99999
 gui.Parent = parentGui
 K.ScreenGui = gui
 
--- уведомления
+-- Уведомления
 local NotifyContainer = Instance.new("Frame", gui)
 NotifyContainer.Size = UDim2.new(0, 320, 1, -80)
 NotifyContainer.Position = UDim2.new(1, -330, 0, 50)
@@ -106,7 +100,7 @@ K.Notify = function(title, text, isErr)
     end)
 end
 
--- главное окно
+-- Главное окно
 local main = Instance.new("Frame")
 main.Size = UDim2.new(0, 480, 0, 560)
 main.Position = UDim2.new(0.5, -240, 0.5, -280)
@@ -129,7 +123,7 @@ mainStroke.Color = Theme.Accent
 mainStroke.Thickness = 1.5
 mainStroke.Transparency = 0.5
 
--- заголовок
+-- Заголовок
 local header = Instance.new("Frame")
 header.Size = UDim2.new(1, 0, 0, 44)
 header.BackgroundColor3 = Theme.Glass
@@ -171,7 +165,7 @@ closeBtn.Parent = header
 Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6)
 closeBtn.MouseButton1Click:Connect(function() gui.Enabled = false end)
 
--- drag
+-- Перетаскивание
 do
     local dragging, startPos, startInput
     header.InputBegan:Connect(function(input)
@@ -190,7 +184,7 @@ do
     end)
 end
 
--- вкладки
+-- Вкладки
 local tabsBar = Instance.new("Frame")
 tabsBar.Size = UDim2.new(1, -20, 0, 34)
 tabsBar.Position = UDim2.new(0, 10, 0, 50)
@@ -255,7 +249,7 @@ local function makeTab(name, key, icon)
     return page
 end
 
--- хелперы виджетов
+-- Хелперы
 local function addToggle(parent, text, path)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1, -4, 0, 32)
@@ -378,18 +372,10 @@ local function addSection(parent, text)
     return lbl
 end
 
--- ============ ВКЛАДКИ ============
+-- Вкладки
 local pVisual = makeTab("Визуал", "visual", "👁")
 local pCombat = makeTab("Бой", "combat", "🎯")
 local pMisc   = makeTab("Миск", "misc", "⚙")
-local pExtra = nil
-local hasExtra = K.GetSetting("Skins") or K.GetSetting("ThirdPerson") or K.GetSetting("Teleport")
-if hasExtra then
-    local tabName = "Доп"
-    if K.GetSetting("Skins") then tabName = "CS" end
-    if K.GetSetting("Teleport") then tabName = "ТП" end
-    pExtra = makeTab(tabName, "extra", "✨")
-end
 
 -- Визуал
 addSection(pVisual, "ESP")
@@ -434,22 +420,6 @@ addToggle(pMisc, "No-Flash", "Misc.NoFlash")
 addSection(pMisc, "Защита")
 addToggle(pMisc, "Anti-AFK", "Security.AntiAFK")
 
--- Доп (CS:GO / Valiant специфика)
-if K.GetSetting("Skins") then
-    if pExtra then addSection(pExtra, "Skins") end
-    if pExtra then addToggle(pExtra, "Skin Changer", "Skins.Enabled") end
-end
-if K.GetSetting("ThirdPerson") then
-    if pExtra then addSection(pExtra, "Third Person") end
-    if pExtra then addToggle(pExtra, "Third Person", "ThirdPerson.Enabled") end
-    if pExtra then addToggle(pExtra, "Char Preview", "ThirdPerson.Preview") end
-end
-if K.GetSetting("Teleport") then
-    if pExtra then addSection(pExtra, "Teleport") end
-    if pExtra then addToggle(pExtra, "Teleport to player (T)", "Teleport.Enabled") end
-end
-
--- активируем первую вкладку
 if #buttons > 0 then
     local firstKey = next(pages)
     pages[firstKey].Visible = true
@@ -458,7 +428,6 @@ if #buttons > 0 then
     firstBtn.TextColor3 = Color3.fromRGB(20, 20, 20)
 end
 
--- горячая клавиша F4
 UIS.InputBegan:Connect(function(input, gp)
     if input.KeyCode == Enum.KeyCode.F4 then
         gui.Enabled = not gui.Enabled
@@ -469,7 +438,6 @@ UIS.InputBegan:Connect(function(input, gp)
     end
 end)
 
--- фикс мыши
 RunService.RenderStepped:Connect(function()
     if gui.Enabled then
         if UIS.MouseBehavior ~= Enum.MouseBehavior.Default then UIS.MouseBehavior = Enum.MouseBehavior.Default end
@@ -481,4 +449,4 @@ K.Loading = false
 task.delay(0.5, function()
     K.Notify("KIRO", "Загружено! F4 — меню", false)
 end)
-print("[KIRO UI] Меню загружено (Unified).")
+print("[KIRO UI] Меню загружено.")
