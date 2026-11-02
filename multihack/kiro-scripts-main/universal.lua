@@ -89,23 +89,32 @@ function K.SecureLoad(url)
     raw, wrapped = nil, nil
 end
 
--- ============ АНТИ-ДАМП ============
-local oldInfo = debug.info
-debug.info = function(...)
-    local a = {...}
-    if typeof(a[1]) == "function" and getfenv(a[1]).KIRO_PROTECTED then
-        return "C","C",1,1
+-- ============ АНТИ-ДАМП (ИСПРАВЛЕНО) ============
+-- Оборачиваем в pcall и снимаем защиту таблиц, чтобы не было ошибки readonly table
+pcall(function()
+    local oldInfo = debug.info
+    if setreadonly then setreadonly(debug, false) end
+    debug.info = function(...)
+        local a = {...}
+        if typeof(a[1]) == "function" and getfenv(a[1]).KIRO_PROTECTED then
+            return "C","C",1,1
+        end
+        return oldInfo(...)
     end
-    return oldInfo(...)
-end
+    if setreadonly then setreadonly(debug, true) end
+end)
 
-local oldDump = string.dump
-string.dump = function(f, s)
-    if getfenv(f) and getfenv(f).KIRO_PROTECTED then
-        return "\27LuaS"
+pcall(function()
+    local oldDump = string.dump
+    if setreadonly then setreadonly(string, false) end
+    string.dump = function(f, s)
+        if getfenv(f) and getfenv(f).KIRO_PROTECTED then
+            return "\27LuaS"
+        end
+        return oldDump(f, s)
     end
-    return oldDump(f, s)
-end
+    if setreadonly then setreadonly(string, true) end
+end)
 
 -- ============ ЗАГРУЗКА КОНФИГА ============
 local cfgOk, cfgRaw = pcall(game.HttpGet, game, BASE.."config.lua")
