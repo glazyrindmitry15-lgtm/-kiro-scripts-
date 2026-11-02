@@ -3,7 +3,8 @@
 -- =====================================================================
 print("[KIRO] Инициализация лаунчера...")
 
-local BASE = "https://raw.githubusercontent.com/glazyrindmitry15-lgtm/kiro-scripts/main/"
+-- ОБНОВЛЕННАЯ ССЫЛКА НА ТВОЙ НОВЫЙ РЕПОЗИТОРИЙ:
+local BASE = "https://raw.githubusercontent.com/glazyrindmitry15-lgtm/-kiro-scripts-/main/"
 local KEY  = "KiroSuperSecretKey2026"
 
 -- ============ ШИФРОВАНИЕ (XOR + Base64) ============
@@ -89,35 +90,8 @@ function K.SecureLoad(url)
     raw, wrapped = nil, nil
 end
 
--- ============ АНТИ-ДАМП (ИСПРАВЛЕНО) ============
--- Оборачиваем в pcall и снимаем защиту таблиц, чтобы не было ошибки readonly table
-pcall(function()
-    local oldInfo = debug.info
-    if setreadonly then setreadonly(debug, false) end
-    debug.info = function(...)
-        local a = {...}
-        if typeof(a[1]) == "function" and getfenv(a[1]).KIRO_PROTECTED then
-            return "C","C",1,1
-        end
-        return oldInfo(...)
-    end
-    if setreadonly then setreadonly(debug, true) end
-end)
-
-pcall(function()
-    local oldDump = string.dump
-    if setreadonly then setreadonly(string, false) end
-    string.dump = function(f, s)
-        if getfenv(f) and getfenv(f).KIRO_PROTECTED then
-            return "\27LuaS"
-        end
-        return oldDump(f, s)
-    end
-    if setreadonly then setreadonly(string, true) end
-end)
-
 -- ============ ЗАГРУЗКА КОНФИГА ============
-local cfgOk, cfgRaw = pcall(game.HttpGet, game, BASE.."config.lua")
+local cfgOk, cfgRaw = pcall(game.HttpGet, game, BASE.."config.lua?nocache="..tostring(os.time()))
 if not cfgOk or not cfgRaw or cfgRaw == "" then
     warn("[KIRO] Не удалось загрузить config.lua")
     return
